@@ -37,6 +37,12 @@ const soundOn       = select('.icon-sound-on');
 const soundOff      = select('.icon-sound-off');
 const keyClick      = select('#keyClick');
 const keyBeep       = select('#keyBeep');
+//highscore
+const contestant	= select('#contestant');
+const highscore		= select('#highscore');
+var highscoreTable  = JSON.parse(localStorage.getItem("HIGHSCORE")) || [];
+
+const categories	= ["lorem", "deutsch", "english", "code"]
 
 let sound = true;
 soundOn.addEventListener('click', e => {
@@ -74,7 +80,7 @@ class speedTyping {
         this.cpm            = 0;        // CPM counter
         this.wpm            = 0;        // WPM cpm / 5 
         this.interval       = null;     // interval counter
-        this.duration       = 60        // Test duration time (60 seconds)
+        this.duration       = 5        // Test duration time (60 seconds)
         this.typing         = false;    // To check if we are typing
         this.quote          = [];       // Quotes array
         this.author         = [];       // Authors array
@@ -109,8 +115,9 @@ class speedTyping {
     // Start typing function when run when Start button clicked
     start() {
         
-        // Filter out not 'easy' quotes. Later we could make difficulty levels?
-        const filterdQuotes = allQuotes.filter(item => item.level !== 'Easy');
+		const category = select('input[name="category"]:checked');
+        // Filter out quotes from selected category.
+        const filterdQuotes = allQuotes.filter(item => item.level == category.value);
         // Get Authors / Quotes only
         const getQuote  = filterdQuotes.map(item => item.quote);
         const getAuthor = filterdQuotes.map(item => item.author);
@@ -239,6 +246,10 @@ class speedTyping {
 
     // Last action
     finish() {
+		// Add to highscore
+		this.addHighScore(contestant.value, this.wpm, this.errorIndex, "english");
+		this.updateHighscore();
+		
         // Show the modal
         modal.style.display = 'block';
         const wpm = this.wpm;
@@ -293,9 +304,30 @@ class speedTyping {
         // Save the wpm values values to localStorage        
         localStorage.setItem('WPM', wpm);
     }
+	
+	addHighScore(contestant, wpm, errors, category) {
+		const entry = {'contestant': contestant, 'wpm': wpm, 'errors': errors, 'category': category};
+		const index = highscoreTable.findIndex((x) => x['wpm'] < wpm); 
+		if (index === -1) { 
+			highscoreTable.push(entry); 
+		} else { 
+			highscoreTable.splice(index, 0, entry); 
+		} 
+
+		localStorage.setItem('HIGHSCORE', JSON.stringify(highscoreTable));
+	}
+
+	updateHighscore(){
+		var e = ""
+		for (var i in highscoreTable){
+			e = e + `<tr><td>${highscoreTable[i].contestant}</td><td>${highscoreTable[i].wpm}</td><td>${highscoreTable[i].errors}</td></tr>`;
+		}
+		highscore.innerHTML = `<table> <thead> <tr> <th>Contestant</th><th>WPM</th><th>Errors</th></tr> </thead> <tbody> ${e} </tbody> <tfoot> </tfoot> </table>`;
+	}
 }
 // Init the class
 const typingTest = new speedTyping();
+typingTest.updateHighscore();
 
 // Start the test when Start btn clicked
 btnPaly.addEventListener('click', () => typingTest.start());

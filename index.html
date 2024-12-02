@@ -45,8 +45,16 @@
             <div class="col-sm-12 col-md-8 order-md-1">
                 <div class="container">
                     <div class="header text-center mt-4">
-                        <p class="info lead">How fast is your typing?<br>Click on the <strong>start</strong> button
-                            below to start the one-minute typing test and find out!
+						<p class="info lead">
+							Hello <input id="contestant" class="text-end" autocomplete="off" placeholder="Typer#23" pattern="[A-Za-z0-9]*"></input>, <br>
+							How fast is your typing?  <br>
+							Chose your category and click on the <strong>start</strong> button below to start the one-minute typing test and find out!<br> 
+						  <form>
+								<fieldset>
+									 <label> <input type="radio" name="category" value="lorem" checked> Lorem </label> 
+									 <label> <input type="radio" name="category" value="code"> Code </label>
+								</fieldset>
+							</form>
                         </p>
 
                         <div class="control">
@@ -110,6 +118,13 @@
                             <span class="col" style="background: #4ec04e">80 - 100+ Top</span>
                         </div>
                     </div>
+					<hr>
+					<div>
+						<h3 class="py-2">Highscore</h3>
+						<table id="highscore">
+
+						</table>
+					</div>
                     <hr>
                     <footer class="docs-footer small text-muted" role="contentinfo">
                         <div class="footer-info text-center">
@@ -190,7 +205,7 @@
             <audio id="keyBeep" src="sound/beep.wav" hidden></audio>
 
     </section>
-    <script src="js/speedTyping.min.js"></script>
+    <script src="js/speedTyping.js"></script>
 </body>
 
 </html>
