@@ -80,7 +80,7 @@ class speedTyping {
         this.cpm            = 0;        // CPM counter
         this.wpm            = 0;        // WPM cpm / 5 
         this.interval       = null;     // interval counter
-        this.duration       = 5        // Test duration time (60 seconds)
+        this.duration       = 60;       // Test duration time (60 seconds)
         this.typing         = false;    // To check if we are typing
         this.quote          = [];       // Quotes array
         this.author         = [];       // Authors array
@@ -116,6 +116,7 @@ class speedTyping {
     start() {
         
 		const category = select('input[name="category"]:checked');
+		this.category = category.value;
         // Filter out quotes from selected category.
         const filterdQuotes = allQuotes.filter(item => item.level == category.value);
         // Get Authors / Quotes only
@@ -247,7 +248,7 @@ class speedTyping {
     // Last action
     finish() {
 		// Add to highscore
-		this.addHighScore(contestant.value, this.wpm, this.errorIndex, "english");
+		this.addHighScore(contestant.value, this.cpm, this.errorIndex, this.category);
 		this.updateHighscore();
 		
         // Show the modal
@@ -305,9 +306,9 @@ class speedTyping {
         localStorage.setItem('WPM', wpm);
     }
 	
-	addHighScore(contestant, wpm, errors, category) {
-		const entry = {'contestant': contestant, 'wpm': wpm, 'errors': errors, 'category': category};
-		const index = highscoreTable.findIndex((x) => x['wpm'] < wpm); 
+	addHighScore(contestant, cpm, errors, category) {
+		const entry = {'contestant': contestant, 'cpm': cpm, 'errors': errors, 'category': category};
+		const index = highscoreTable.findIndex((x) => x['cpm'] < cpm); 
 		if (index === -1) { 
 			highscoreTable.push(entry); 
 		} else { 
@@ -320,9 +321,9 @@ class speedTyping {
 	updateHighscore(){
 		var e = ""
 		for (var i in highscoreTable){
-			e = e + `<tr><td>${highscoreTable[i].contestant}</td><td>${highscoreTable[i].wpm}</td><td>${highscoreTable[i].errors}</td></tr>`;
+			e = e + `<tr><td>${highscoreTable[i].contestant}</td><td>${highscoreTable[i].cpm}</td><td>${highscoreTable[i].errors}</td><td>${highscoreTable[i].category}</td></tr>`;
 		}
-		highscore.innerHTML = `<table> <thead> <tr> <th>Contestant</th><th>WPM</th><th>Errors</th></tr> </thead> <tbody> ${e} </tbody> <tfoot> </tfoot> </table>`;
+		highscore.innerHTML = `<table> <thead> <tr> <th>Contestant</th><th>CPM</th><th>Errors</th><th>Category</ht></tr></thead> <tbody> ${e} </tbody> <tfoot> </tfoot> </table>`;
 	}
 }
 // Init the class
@@ -333,6 +334,9 @@ typingTest.updateHighscore();
 btnPaly.addEventListener('click', () => typingTest.start());
 // Reload the page when Refresh btn is clicked
 btnRefresh.addEventListener('click', () => location.reload());
+
+// Avoid strange characters in highscore table
+contestant.addEventListener('input', function() {this.value = this.value.replace(/[^A-Za-z0-9 Öäöüß]/g, ''); });
 
 // Save last wpm result to Local storage
 const savedWPM = localStorage.getItem('WPM') || 0;
